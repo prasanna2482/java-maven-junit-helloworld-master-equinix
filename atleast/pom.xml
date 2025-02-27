@@ -39,8 +39,7 @@
       <artifactId>hamcrest-core</artifactId>
       <version>${hamcrest.version}</version>
     </dependency>
-    <dependency>
-
+    </dependencies>
   <build>
     <plugins>
       <plugin>
