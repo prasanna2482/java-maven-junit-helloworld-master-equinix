@@ -1,6 +1,7 @@
 package com.example.javamavenjunithelloworld;
 
 import java.io.PrintStream;
+import java.sql.*;
 
 /**
  * Simple class that says "Hello!".
@@ -39,8 +40,6 @@ public class Hello {
             printer.println(HELLO);
         }
     }
-import java.sql.*;
-
 public class UnsafeSQL {
     public void runQuery(String userInput) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/test", "user", "pass");
