@@ -1,3 +1,5 @@
+import java.sql.*;
+
 public class UnsafeSQL {
     public void runQuery(String userInput) throws SQLException {
         Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/test", "user", "pass");
