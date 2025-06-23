@@ -3,50 +3,91 @@ package com.example.javamavenjunithelloworld;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HelloTest {
+class HelloTest {
 
     @Test
-    public void testSayHelloOnce() {
+    void testDefaultConstructor() {
         Hello hello = new Hello();
-        hello.setTimes(1);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        hello.sayHello(new PrintStream(out));
-
-        assertEquals("Hello!\n", out.toString());
+        assertEquals(1, hello.times); // Testing default times value
     }
 
     @Test
-    public void testSayHelloMultipleTimes() {
+    void testSetTimesWithValidValues() {
+        Hello hello = new Hello();
+        
+        // Test minimum valid value
+        hello.setTimes(0);
+        assertEquals(0, hello.times);
+        
+        // Test maximum valid value
+        hello.setTimes(Hello.MAXIMUM_AMOUNT_OF_TIMES);
+        assertEquals(Hello.MAXIMUM_AMOUNT_OF_TIMES, hello.times);
+        
+        // Test a middle value
+        hello.setTimes(10);
+        assertEquals(10, hello.times);
+    }
+
+    @Test
+    void testSetTimesWithInvalidValues() {
+        Hello hello = new Hello();
+        
+        // Test negative value
+        IllegalArgumentException negativeEx = assertThrows(IllegalArgumentException.class, 
+            () -> hello.setTimes(-1));
+        assertTrue(negativeEx.getMessage().contains("positive number"));
+        
+        // Test value above maximum
+        IllegalArgumentException aboveMaxEx = assertThrows(IllegalArgumentException.class, 
+            () -> hello.setTimes(Hello.MAXIMUM_AMOUNT_OF_TIMES + 1));
+        assertTrue(aboveMaxEx.getMessage().contains("no larger than"));
+    }
+
+    @Test
+    void testSayHelloWithDefaultTimes() {
+        Hello hello = new Hello();
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        
+        hello.sayHello(System.out);
+        
+        assertEquals("Hello!\n", outContent.toString());
+    }
+
+    @Test
+    void testSayHelloWithZeroTimes() {
+        Hello hello = new Hello();
+        hello.setTimes(0);
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        
+        hello.sayHello(System.out);
+        
+        assertEquals("", outContent.toString());
+    }
+
+    @Test
+    void testSayHelloWithMultipleTimes() {
         Hello hello = new Hello();
         hello.setTimes(3);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        hello.sayHello(new PrintStream(out));
-
-        assertEquals("Hello!\nHello!\nHello!\n", out.toString());
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        
+        hello.sayHello(System.out);
+        
+        assertEquals("Hello!\nHello!\nHello!\n", outContent.toString());
     }
 
     @Test
-    public void testSetTimesTooHigh() {
+    void testSayHelloWithCustomPrintStream() {
         Hello hello = new Hello();
-        IllegalArgumentException thrown = assertThrows(
-                IllegalArgumentException.class,
-                () -> hello.setTimes(21)
-        );
-        assertTrue(thrown.getMessage().contains("positive number no larger than"));
-    }
-
-    @Test
-    public void testSetTimesNegative() {
-        Hello hello = new Hello();
-        IllegalArgumentException thrown = assertThrows(
-                IllegalArgumentException.class,
-                () -> hello.setTimes(-1)
-        );
-        assertTrue(thrown.getMessage().contains("positive number no larger than"));
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        PrintStream customPrintStream = new PrintStream(outContent);
+        
+        hello.sayHello(customPrintStream);
+        
+        assertEquals("Hello!\n", outContent.toString());
     }
 }
