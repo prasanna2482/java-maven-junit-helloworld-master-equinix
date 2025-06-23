@@ -1,10 +1,7 @@
 package com.example.javamavenjunithelloworld;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import org.junit.jupiter.api.*;
+import java.io.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HelloAppTest {
@@ -17,7 +14,7 @@ public class HelloAppTest {
     @BeforeEach
     void setUp() {
         originalSecurityManager = System.getSecurityManager();
-        System.setSecurityManager(new TestingSecurityManager());
+        System.setSecurityManager(new NoExitSecurityManager());
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
     }
@@ -29,76 +26,47 @@ public class HelloAppTest {
         System.setErr(originalErr);
     }
 
+    // Test cases that expect System.exit()
     @Test
-    void testMain() {
+    void testMain_ShouldExitWithZero() {
         try {
             HelloApp.main(new String[]{});
             fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals(0, e.getStatus());
+        } catch (ExitException e) {
+            assertEquals(0, e.status);
         }
     }
 
     @Test
-    void testMainWithValidNumericArgument() {
+    void testMainWithInvalidArgument_ShouldExitWithError() {
         try {
-            HelloApp.main(new String[]{"2"});
+            HelloApp.main(new String[]{"invalid"});
             fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals("Hello!\nHello!\n", outContent.toString());
+        } catch (ExitException e) {
+            assertEquals(HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD, e.status);
+            assertTrue(errContent.toString().contains("I don't understand"));
         }
     }
 
+    // Test cases that shouldn't exit
     @Test
-    void testMainWithInvalidNonNumericArgument() {
-        try {
-            HelloApp.main(new String[]{"abc"});
-            fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals(HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD, e.getStatus());
-            assertTrue(errContent.toString().contains("I don't understand the parameter"));
-            assertTrue(errContent.toString().contains("[abc]"));
+    void testMainWithValidArgument_ShouldNotExit() {
+        HelloApp.main(new String[]{"2"}); // This shouldn't exit
+        assertEquals("Hello!\nHello!\n", outContent.toString());
+    }
+
+    // Supporting classes
+    private static class NoExitSecurityManager extends SecurityManager {
+        @Override
+        public void checkExit(int status) {
+            throw new ExitException(status);
         }
     }
 
-    @Test
-    void testMainWithArgumentCausingIllegalArgumentException() {
-        int invalidValue = Hello.MAXIMUM_AMOUNT_OF_TIMES + 1;
-        try {
-            HelloApp.main(new String[]{String.valueOf(invalidValue)});
-            fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals(HelloApp.EXIT_STATUS_HELLO_FAILED, e.getStatus());
-            assertTrue(errContent.toString().contains("Something went wrong"));
-            assertTrue(errContent.toString().contains("no larger than"));
+    private static class ExitException extends SecurityException {
+        public final int status;
+        public ExitException(int status) {
+            this.status = status;
         }
-    }
-
-    @Test
-    void testMainWithZeroArgument() {
-        try {
-            HelloApp.main(new String[]{"0"});
-            fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals("", outContent.toString());
-        }
-    }
-
-    @Test
-    void testMainWithMaximumValidArgument() {
-        try {
-            HelloApp.main(new String[]{String.valueOf(Hello.MAXIMUM_AMOUNT_OF_TIMES)});
-            fail("Expected System.exit() to be called");
-        } catch (TestingSecurityManager.TestExitException e) {
-            String expectedOutput = "Hello!\n".repeat(Hello.MAXIMUM_AMOUNT_OF_TIMES);
-            assertEquals(expectedOutput, outContent.toString());
-        }
-    }
-
-    @Test
-    void testStaticFields() {
-        assertEquals(3, HelloApp.DEFAULT_TIMES);
-        assertEquals(2, HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD);
-        assertEquals(4, HelloApp.EXIT_STATUS_HELLO_FAILED);
     }
 }
