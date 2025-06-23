@@ -30,18 +30,6 @@ public class HelloAppTest {
     }
 }
 
-class HelloAppTest {
-
-    @Test
-    void testMainWithNoArguments() {
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
-        HelloApp.main(new String[]{});
-        
-        assertEquals("Hello!\nHello!\nHello!\n", outContent.toString());
-    }
-
     @Test
     void testMainWithValidNumericArgument() {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
