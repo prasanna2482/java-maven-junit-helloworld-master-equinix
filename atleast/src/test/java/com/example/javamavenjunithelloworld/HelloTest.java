@@ -1,60 +1,52 @@
 package com.example.javamavenjunithelloworld;
 
-
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-/**
- * Unit test for Hello.
- * <p/>
- * A unit test aims to test all code and code paths of a specific class.
- */
 public class HelloTest {
 
     @Test
-    public void testSayHello() {
-        OutputStream os = new ByteArrayOutputStream();
-        PrintStream stream = new PrintStream(os, true);
+    public void testSayHelloOnce() {
+        Hello hello = new Hello();
+        hello.setTimes(1);
 
-        Hello hi = new Hello();
-        hi.sayHello(stream);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(out));
 
-        assertThat(os.toString(), is(equalTo(String.format("%s%s", Hello.HELLO, System.lineSeparator()))));
+        assertEquals("Hello!\n", out.toString());
     }
 
     @Test
-    public void testSayHelloAFewTimes() {
-        OutputStream os = new ByteArrayOutputStream();
-        PrintStream stream = new PrintStream(os, true);
+    public void testSayHelloMultipleTimes() {
+        Hello hello = new Hello();
+        hello.setTimes(3);
 
-        Hello hi = new Hello();
-        hi.setTimes(3);
-        hi.sayHello(stream);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(out));
 
-        // Does it say "Hello!" three times?
-        String goal = String.format("%1$s%2$s%1$s%2$s%1$s%2$s", Hello.HELLO, System.lineSeparator());
-        assertThat(os.toString(), is(equalTo(goal)));
+        assertEquals("Hello!\nHello!\nHello!\n", out.toString());
     }
 
     @Test
-    public void testIllegalArgumentForHelloTooMuch() {
-        Hello hi = new Hello();
-        assertThrows(IllegalArgumentException.class, () -> hi.setTimes(Hello.MAXIMUM_AMOUNT_OF_TIMES + 1));
+    public void testSetTimesTooHigh() {
+        Hello hello = new Hello();
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> hello.setTimes(21)
+        );
+        assertTrue(thrown.getMessage().contains("positive number no larger than"));
     }
 
     @Test
-    public void testIllegalArgumentForHelloNegative() {
-        Hello hi = new Hello();
-        assertThrows(IllegalArgumentException.class, () -> hi.setTimes(-1));
+    public void testSetTimesNegative() {
+        Hello hello = new Hello();
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> hello.setTimes(-1)
+        );
+        assertTrue(thrown.getMessage().contains("positive number no larger than"));
     }
 }
