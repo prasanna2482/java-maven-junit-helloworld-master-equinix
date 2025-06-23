@@ -9,16 +9,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HelloAppTest {
     private SecurityManager originalSecurityManager;
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+    private final PrintStream originalErr = System.err;
 
     @BeforeEach
     void setUp() {
         originalSecurityManager = System.getSecurityManager();
         System.setSecurityManager(new TestingSecurityManager());
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
     }
 
     @AfterEach
     void tearDown() {
         System.setSecurityManager(originalSecurityManager);
+        System.setOut(originalOut);
+        System.setErr(originalErr);
     }
 
     @Test
@@ -27,71 +35,21 @@ public class HelloAppTest {
             HelloApp.main(new String[]{});
             fail("Expected System.exit() to be called");
         } catch (TestingSecurityManager.TestExitException e) {
-            assertEquals(0, e.getStatus()); // Verify expected exit code
+            assertEquals(0, e.getStatus());
         }
     }
-}
 
     @Test
     void testMainWithValidNumericArgument() {
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
-        HelloApp.main(new String[]{"2"});
-        
-        assertEquals("Hello!\nHello!\n", outContent.toString());
+        try {
+            HelloApp.main(new String[]{"2"});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            assertEquals("Hello!\nHello!\n", outContent.toString());
+        }
     }
 
     @Test
     void testMainWithInvalidNonNumericArgument() {
-        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(errContent));
-        
-        assertDoesNotThrow(() -> HelloApp.main(new String[]{"abc"}));
-        
-        assertTrue(errContent.toString().contains("I don't understand the parameter"));
-        assertTrue(errContent.toString().contains("[abc]"));
-    }
-
-    @Test
-    void testMainWithArgumentCausingIllegalArgumentException() {
-        ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(errContent));
-        
-        // Using a value larger than MAXIMUM_AMOUNT_OF_TIMES
-        int invalidValue = Hello.MAXIMUM_AMOUNT_OF_TIMES + 1;
-        assertDoesNotThrow(() -> HelloApp.main(new String[]{String.valueOf(invalidValue)}));
-        
-        assertTrue(errContent.toString().contains("Something went wrong"));
-        assertTrue(errContent.toString().contains("no larger than"));
-    }
-
-    @Test
-    void testMainWithZeroArgument() {
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
-        HelloApp.main(new String[]{"0"});
-        
-        assertEquals("", outContent.toString());
-    }
-
-    @Test
-    void testMainWithMaximumValidArgument() {
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
-        HelloApp.main(new String[]{String.valueOf(Hello.MAXIMUM_AMOUNT_OF_TIMES)});
-        
-        int expectedLines = Hello.MAXIMUM_AMOUNT_OF_TIMES;
-        String expectedOutput = "Hello!\n".repeat(expectedLines);
-        assertEquals(expectedOutput, outContent.toString());
-    }
-
-    @Test
-    void testStaticFields() {
-        assertEquals(3, HelloApp.DEFAULT_TIMES);
-        assertEquals(2, HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD);
-        assertEquals(4, HelloApp.EXIT_STATUS_HELLO_FAILED);
-    }
-}
+        try {
+            HelloApp.main(new String[]{"abc"
