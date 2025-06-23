@@ -8,9 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class HelloTest {
 
     @Test
-    void testDefaultConstructor() {
+    void testDefaultBehavior() {
         Hello hello = new Hello();
-        assertEquals(1, hello.times); // Testing default times value
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(outContent));
+        assertEquals("Hello!\n", outContent.toString());
     }
 
     @Test
@@ -19,15 +21,22 @@ class HelloTest {
         
         // Test minimum valid value
         hello.setTimes(0);
-        assertEquals(0, hello.times);
+        ByteArrayOutputStream outContent0 = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(outContent0));
+        assertEquals("", outContent0.toString());
         
         // Test maximum valid value
         hello.setTimes(Hello.MAXIMUM_AMOUNT_OF_TIMES);
-        assertEquals(Hello.MAXIMUM_AMOUNT_OF_TIMES, hello.times);
+        ByteArrayOutputStream outContentMax = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(outContentMax));
+        String expectedMax = "Hello!\n".repeat(Hello.MAXIMUM_AMOUNT_OF_TIMES);
+        assertEquals(expectedMax, outContentMax.toString());
         
         // Test a middle value
-        hello.setTimes(10);
-        assertEquals(10, hello.times);
+        hello.setTimes(3);
+        ByteArrayOutputStream outContent3 = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(outContent3));
+        assertEquals("Hello!\nHello!\nHello!\n", outContent3.toString());
     }
 
     @Test
@@ -46,48 +55,24 @@ class HelloTest {
     }
 
     @Test
-    void testSayHelloWithDefaultTimes() {
+    void testSayHelloWithDifferentTimes() {
         Hello hello = new Hello();
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
         
-        hello.sayHello(System.out);
+        // Test default (1 time)
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(out1));
+        assertEquals("Hello!\n", out1.toString());
         
-        assertEquals("Hello!\n", outContent.toString());
-    }
-
-    @Test
-    void testSayHelloWithZeroTimes() {
-        Hello hello = new Hello();
+        // Test 0 times
         hello.setTimes(0);
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+        ByteArrayOutputStream out0 = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(out0));
+        assertEquals("", out0.toString());
         
-        hello.sayHello(System.out);
-        
-        assertEquals("", outContent.toString());
-    }
-
-    @Test
-    void testSayHelloWithMultipleTimes() {
-        Hello hello = new Hello();
-        hello.setTimes(3);
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        
-        hello.sayHello(System.out);
-        
-        assertEquals("Hello!\nHello!\nHello!\n", outContent.toString());
-    }
-
-    @Test
-    void testSayHelloWithCustomPrintStream() {
-        Hello hello = new Hello();
-        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        PrintStream customPrintStream = new PrintStream(outContent);
-        
-        hello.sayHello(customPrintStream);
-        
-        assertEquals("Hello!\n", outContent.toString());
+        // Test multiple times
+        hello.setTimes(2);
+        ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+        hello.sayHello(new PrintStream(out2));
+        assertEquals("Hello!\nHello!\n", out2.toString());
     }
 }
