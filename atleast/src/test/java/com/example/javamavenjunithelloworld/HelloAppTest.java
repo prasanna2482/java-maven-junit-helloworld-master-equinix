@@ -52,4 +52,53 @@ public class HelloAppTest {
     @Test
     void testMainWithInvalidNonNumericArgument() {
         try {
-            HelloApp.main(new String[]{"abc"
+            HelloApp.main(new String[]{"abc"});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            assertEquals(HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD, e.getStatus());
+            assertTrue(errContent.toString().contains("I don't understand the parameter"));
+            assertTrue(errContent.toString().contains("[abc]"));
+        }
+    }
+
+    @Test
+    void testMainWithArgumentCausingIllegalArgumentException() {
+        int invalidValue = Hello.MAXIMUM_AMOUNT_OF_TIMES + 1;
+        try {
+            HelloApp.main(new String[]{String.valueOf(invalidValue)});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            assertEquals(HelloApp.EXIT_STATUS_HELLO_FAILED, e.getStatus());
+            assertTrue(errContent.toString().contains("Something went wrong"));
+            assertTrue(errContent.toString().contains("no larger than"));
+        }
+    }
+
+    @Test
+    void testMainWithZeroArgument() {
+        try {
+            HelloApp.main(new String[]{"0"});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            assertEquals("", outContent.toString());
+        }
+    }
+
+    @Test
+    void testMainWithMaximumValidArgument() {
+        try {
+            HelloApp.main(new String[]{String.valueOf(Hello.MAXIMUM_AMOUNT_OF_TIMES)});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            String expectedOutput = "Hello!\n".repeat(Hello.MAXIMUM_AMOUNT_OF_TIMES);
+            assertEquals(expectedOutput, outContent.toString());
+        }
+    }
+
+    @Test
+    void testStaticFields() {
+        assertEquals(3, HelloApp.DEFAULT_TIMES);
+        assertEquals(2, HelloApp.EXIT_STATUS_PARAMETER_NOT_UNDERSTOOD);
+        assertEquals(4, HelloApp.EXIT_STATUS_HELLO_FAILED);
+    }
+}
