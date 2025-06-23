@@ -5,6 +5,31 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import static org.junit.jupiter.api.Assertions.*;
 
+public class HelloAppTest {
+    private SecurityManager originalSecurityManager;
+
+    @BeforeEach
+    void setUp() {
+        originalSecurityManager = System.getSecurityManager();
+        System.setSecurityManager(new TestingSecurityManager());
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setSecurityManager(originalSecurityManager);
+    }
+
+    @Test
+    void testMain() {
+        try {
+            HelloApp.main(new String[]{});
+            fail("Expected System.exit() to be called");
+        } catch (TestingSecurityManager.TestExitException e) {
+            assertEquals(0, e.getStatus()); // Verify expected exit code
+        }
+    }
+}
+
 class HelloAppTest {
 
     @Test
