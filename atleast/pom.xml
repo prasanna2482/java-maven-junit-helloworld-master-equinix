@@ -84,14 +84,7 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
-						<configuration>
-						    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-						    <outputEncoding>UTF-8</outputEncoding>
-						    <xml>true</xml>
-						    <html>true</html>
-						    <csv>false</csv>
-						  </configuration>
-					      </execution>
+						</execution>
 				</executions>
 			</plugin>
 			<plugin>
