@@ -1,6 +1,6 @@
 # A Java/Maven/JUnit HelloWorld example
 
-A "Hello World@@@111” sample written in Java using Maven for the build, that showcases a few very simple tests.
+A "Hello World@@@222” sample written in Java using Maven for the build, that showcases a few very simple tests.
 
 This example demonstrates:
 
