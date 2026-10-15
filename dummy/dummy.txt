@@ -1,3 +1,4 @@
 db.username=admin1
 db.password=mySuperSecretPassword
 api.key=sk_test_4eC39HqLyjWDarjtT1zdp7dc
+#Testing Folder Pattern

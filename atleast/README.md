@@ -1,6 +1,6 @@
-# A Java/Maven/JUnit HelloWorld example
+# A Java/Maven/JUnit HelloWorld example - Making for testing Folder Pattern
 
-A "Hello World@@@222” sample written in Java using Maven for the build, that showcases a few very simple tests.
+A "Hello World” sample written in Java using Maven for the build, that showcases a few very simple tests.
 
 This example demonstrates:
 
